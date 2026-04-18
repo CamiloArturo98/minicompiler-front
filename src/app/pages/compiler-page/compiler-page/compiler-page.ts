@@ -11,11 +11,12 @@ import { StatusBarComponent }   from '../../../components/status-bar/status-bar.
 
 @Component({
   selector: 'app-compiler-page',
+  standalone: true,
   imports: [ToolbarComponent, EditorComponentTs, OutputPanelComponent, StatusBarComponent],
   templateUrl: './compiler-page.html',
 })
-export class CompilerPage {
-    private readonly compilerService = inject(CompilerService);
+export class CompilerPageComponent {
+  private readonly compilerService = inject(CompilerService);
 
   sourceCode   = signal<string>(CODE_EXAMPLES['fibonacci'].code);
   loading      = signal<boolean>(false);

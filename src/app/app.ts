@@ -3,8 +3,9 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [RouterOutlet],
-  templateUrl: '../app/pages/compiler-page/compiler-page/compiler-page.html',
+  templateUrl: './app.html',
 })
 export class App {
   protected readonly title = signal('minicompiler-front');
