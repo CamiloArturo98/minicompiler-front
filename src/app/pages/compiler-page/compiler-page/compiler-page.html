@@ -1,0 +1,61 @@
+    <div class="flex flex-col h-screen overflow-hidden bg-[var(--color-bg)]">
+
+      <!-- Toolbar -->
+      <app-toolbar
+        [options]="options()"
+        [loading]="loading()"
+        (run)="onRun()"
+        (loadExample)="onLoadExample($event)"
+        (toggleOption)="onToggle($event)" />
+
+      <!-- Main area: Editor + Output -->
+      <div class="flex flex-1 overflow-hidden">
+
+        <!-- Editor pane -->
+        <div class="flex flex-col border-r border-[var(--color-border)]"
+            [style.width]="editorWidth + '%'">
+
+          <!-- Editor header -->
+          <div class="flex items-center justify-between px-4 py-2
+                      border-b border-[var(--color-border)] bg-[var(--color-surface2)]">
+            <div class="flex items-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-red-500/60"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
+              <span class="ml-2 text-[11px] text-[var(--color-text-mute)] font-mono">main.ms</span>
+            </div>
+            <div class="flex items-center gap-3 text-[10px] text-zinc-600 font-mono">
+              <span>{{ sourceCode().length }} chars</span>
+              <span>{{ lineCount() }} lines</span>
+            </div>
+          </div>
+
+          <!-- CodeMirror Editor -->
+          <div class="flex-1 overflow-hidden bg-[#0d0d0f]">
+            <app-editor
+              [value]="sourceCode()"
+              (changed)="onCodeChange($event)" />
+          </div>
+        </div>
+
+        <!-- Resize handle -->
+        <div
+          class="w-1 cursor-col-resize bg-[var(--color-border)] hover:bg-amber-500/40
+                transition-colors duration-200 active:bg-amber-500/60"
+          (mousedown)="startResize($event)">
+        </div>
+
+        <!-- Output pane -->
+        <div class="flex-1 overflow-hidden">
+          <app-output-panel
+            [response]="response()"
+            [error]="compileError()" />
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <app-status-bar
+        [response]="response()"
+        [cursorLine]="cursorLine()"
+        [cursorCol]="cursorCol()" />
+    </div>
