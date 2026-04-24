@@ -7,12 +7,13 @@ import { EditorComponentTs }      from '../../../components/editor/editor.compon
 import { ToolbarComponent }     from '../../../components/toolbar/toolbar.component/toolbar.component';
 import { OutputPanelComponent } from '../../../components/output-panel/output-panel.component/output-panel.component';
 import { StatusBarComponent }   from '../../../components/status-bar/status-bar.component/status-bar.component';
+import { AiPanel } from "../../../components/ai-panel/ai-panel";
 
 
 @Component({
   selector: 'app-compiler-page',
   standalone: true,
-  imports: [ToolbarComponent, EditorComponentTs, OutputPanelComponent, StatusBarComponent],
+  imports: [ToolbarComponent, EditorComponentTs, OutputPanelComponent, StatusBarComponent, AiPanel],
   templateUrl: './compiler-page.html',
 })
 export class CompilerPageComponent {
@@ -24,16 +25,16 @@ export class CompilerPageComponent {
   compileError = signal<CompileError | null>(null);
   cursorLine   = signal<number>(1);
   cursorCol    = signal<number>(1);
+  aiOpen       = signal<boolean>(false);
   editorWidth  = 50;
 
   options = signal<EditorOptions>({
-    optimize:    true,
-    showTokens:  false,
-    showAst:     false,
+    optimize:     true,
+    showTokens:   false,
+    showAst:      false,
     showBytecode: false
   });
 
-  // ─── Resize ─────────────────────────────────────────────────────────────────
   private resizing = false;
   private startX   = 0;
   private startW   = 50;
@@ -55,7 +56,6 @@ export class CompilerPageComponent {
   @HostListener('document:mouseup')
   onMouseUp(): void { this.resizing = false; }
 
-  // ─── Keyboard shortcut ───────────────────────────────────────────────────────
   @HostListener('document:keydown', ['$event'])
   onKeyDown(e: KeyboardEvent): void {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -64,7 +64,6 @@ export class CompilerPageComponent {
     }
   }
 
-  // ─── Handlers ────────────────────────────────────────────────────────────────
   onCodeChange(code: string): void {
     this.sourceCode.set(code);
     const lines = code.split('\n');
@@ -87,7 +86,6 @@ export class CompilerPageComponent {
 
   onRun(): void {
     if (this.loading()) return;
-
     const code = this.sourceCode().trim();
     if (!code) return;
 
@@ -103,14 +101,8 @@ export class CompilerPageComponent {
       showAst:      opts.showAst,
       showBytecode: opts.showBytecode || opts.optimize
     }).subscribe({
-      next: (res) => {
-        this.response.set(res);
-        this.loading.set(false);
-      },
-      error: (err: CompileError) => {
-        this.compileError.set(err);
-        this.loading.set(false);
-      }
+      next:  (res) => { this.response.set(res);     this.loading.set(false); },
+      error: (err) => { this.compileError.set(err); this.loading.set(false); }
     });
   }
 

@@ -155,3 +155,26 @@ print("3^2 + 4^2 = " + hyp(3, 4));
 print("cube(5) = " + cube(5));`
   }
 };
+
+export type AiAction = 'EXPLAIN_ERROR' | 'SUGGEST_FIX' | 'GENERATE_CODE' | 'ANALYZE_CODE';
+
+export interface AiRequest {
+  action: AiAction;
+  sourceCode?: string;
+  errorMessage?: string;
+  userPrompt?: string;
+}
+
+export interface AiResponse {
+  content: string;
+  action: string;
+  responseTimeMs: number;
+}
+
+export interface AiMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  action?: AiAction;
+  timestamp: Date;
+  loading?: boolean;
+}

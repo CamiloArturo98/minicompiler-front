@@ -6,16 +6,30 @@
         [loading]="loading()"
         (run)="onRun()"
         (loadExample)="onLoadExample($event)"
-        (toggleOption)="onToggle($event)" />
+        (toggleOption)="onToggle($event)">
 
-      <!-- Main area: Editor + Output -->
+        <!-- AI Toggle button proyectado en toolbar -->
+        <button
+          (click)="aiOpen.set(!aiOpen())"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-mono
+                transition-all duration-200"
+          [class.border-amber-500]="aiOpen()"
+          [class.text-amber-400]="aiOpen()"
+          [class.bg-amber-500\/10]="aiOpen()"
+          [class.border-zinc-700]="!aiOpen()"
+          [class.text-zinc-500]="!aiOpen()">
+          <span>✨</span>
+          <span>Copilot</span>
+        </button>
+      </app-toolbar>
+
+      <!-- Main area -->
       <div class="flex flex-1 overflow-hidden">
 
         <!-- Editor pane -->
-        <div class="flex flex-col border-r border-[var(--color-border)]"
-            [style.width]="editorWidth + '%'">
+        <div class="flex flex-col border-r border-[var(--color-border)] transition-all duration-300"
+             [style.width]="aiOpen() ? '40%' : editorWidth + '%'">
 
-          <!-- Editor header -->
           <div class="flex items-center justify-between px-4 py-2
                       border-b border-[var(--color-border)] bg-[var(--color-surface2)]">
             <div class="flex items-center gap-2">
@@ -30,27 +44,38 @@
             </div>
           </div>
 
-          <!-- CodeMirror Editor -->
           <div class="flex-1 overflow-hidden bg-[#0d0d0f]">
-            <app-editor
-              [value]="sourceCode()"
-              (changed)="onCodeChange($event)" />
+            <app-editor [value]="sourceCode()" (changed)="onCodeChange($event)" />
           </div>
         </div>
 
-        <!-- Resize handle -->
-        <div
-          class="w-1 cursor-col-resize bg-[var(--color-border)] hover:bg-amber-500/40
-                transition-colors duration-200 active:bg-amber-500/60"
-          (mousedown)="startResize($event)">
-        </div>
+        <!-- Resize handle (solo cuando AI está cerrado) -->
+        @if (!aiOpen()) {
+          <div class="w-1 cursor-col-resize bg-[var(--color-border)] hover:bg-amber-500/40
+                      transition-colors duration-200"
+               (mousedown)="startResize($event)">
+          </div>
+        }
 
         <!-- Output pane -->
-        <div class="flex-1 overflow-hidden">
+        <div class="flex overflow-hidden transition-all duration-300"
+             [style.width]="aiOpen() ? '35%' : (100 - editorWidth) + '%'">
           <app-output-panel
+            class="flex-1"
             [response]="response()"
             [error]="compileError()" />
         </div>
+
+        <!-- AI Panel -->
+        @if (aiOpen()) {
+          <div class="w-[25%] min-w-64 max-w-xs animate-slide-in overflow-hidden">
+            <app-ai-panel
+              [response]="response()"
+              [error]="compileError()"
+              [sourceCode]="sourceCode()"
+              (close)="aiOpen.set(false)" />
+          </div>
+        }
       </div>
 
       <!-- Status bar -->
