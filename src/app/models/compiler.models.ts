@@ -178,3 +178,13 @@ export interface AiMessage {
   timestamp: Date;
   loading?: boolean;
 }
+
+
+export interface AiHistoryEntry {
+  id: number;
+  userContent: string;
+  assistantContent: string;
+  action: string;
+  responseTimeMs: number;
+  createdAt: string;
+}
