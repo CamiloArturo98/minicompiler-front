@@ -1,0 +1,205 @@
+<div class="min-h-screen flex items-center justify-center bg-[var(--color-bg)] px-4">
+
+  <!-- Card -->
+  <div class="w-full max-w-sm">
+
+    <!-- Logo / header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl
+                  bg-amber-500/10 border border-amber-500/30 mb-4">
+        <span class="text-2xl">⚡</span>
+      </div>
+      <h1 class="text-xl font-mono font-bold text-[var(--color-text)]">
+        MiniCompiler Studio
+      </h1>
+      <p class="text-xs text-[var(--color-text-mute)] font-mono mt-1">
+        VM Studio v1.0
+      </p>
+    </div>
+
+    <!-- Form card -->
+    <div class="bg-[var(--color-surface)] border border-[var(--color-border)]
+                rounded-xl p-6 shadow-xl">
+
+      <!-- Mode tabs -->
+      <div class="flex bg-[var(--color-surface2)] rounded-lg p-1 mb-6">
+        <button
+          (click)="mode.set('login')"
+          class="flex-1 py-1.5 text-xs font-mono rounded-md transition-all duration-200"
+          [class.bg-amber-500]="mode() === 'login'"
+          [class.text-black]="mode() === 'login'"
+          [class.font-bold]="mode() === 'login'"
+          [class.text-zinc-500]="mode() !== 'login'">
+          Login
+        </button>
+        <button
+          (click)="mode.set('register')"
+          class="flex-1 py-1.5 text-xs font-mono rounded-md transition-all duration-200"
+          [class.bg-amber-500]="mode() === 'register'"
+          [class.text-black]="mode() === 'register'"
+          [class.font-bold]="mode() === 'register'"
+          [class.text-zinc-500]="mode() !== 'register'">
+          Register
+        </button>
+      </div>
+
+      <!-- Login form -->
+      @if (mode() === 'login') {
+        <form (ngSubmit)="submit()" #f="ngForm">
+          <div class="space-y-4">
+
+            <div>
+              <label class="block text-xs text-[var(--color-text-mute)] font-mono mb-1">
+                Username
+              </label>
+              <input
+                [(ngModel)]="loginForm.username"
+                name="username"
+                type="text"
+                required
+                autocomplete="username"
+                placeholder="your_username"
+                class="w-full bg-[var(--color-surface2)] border border-[var(--color-border)]
+                       rounded-lg px-3 py-2 text-sm font-mono text-[var(--color-text)]
+                       placeholder-zinc-600 outline-none
+                       focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/20
+                       transition-all duration-200" />
+            </div>
+
+            <div>
+              <label class="block text-xs text-[var(--color-text-mute)] font-mono mb-1">
+                Password
+              </label>
+              <input
+                [(ngModel)]="loginForm.password"
+                name="password"
+                type="password"
+                required
+                autocomplete="current-password"
+                placeholder="••••••••"
+                class="w-full bg-[var(--color-surface2)] border border-[var(--color-border)]
+                       rounded-lg px-3 py-2 text-sm font-mono text-[var(--color-text)]
+                       placeholder-zinc-600 outline-none
+                       focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/20
+                       transition-all duration-200" />
+            </div>
+
+            <!-- Error -->
+            @if (error()) {
+              <p class="text-xs text-red-400 font-mono bg-red-500/10 border border-red-500/20
+                         rounded-lg px-3 py-2">
+                ⚠ {{ error() }}
+              </p>
+            }
+
+            <button
+              type="submit"
+              [disabled]="loading()"
+              class="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400
+                     text-black font-mono font-bold text-sm
+                     transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (loading()) {
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-3 h-3 border-2 border-black/30 border-t-black
+                               rounded-full animate-spin"></span>
+                  Signing in…
+                </span>
+              } @else {
+                Sign In ▶
+              }
+            </button>
+          </div>
+        </form>
+      }
+
+      <!-- Register form -->
+      @if (mode() === 'register') {
+        <form (ngSubmit)="submit()" #f="ngForm">
+          <div class="space-y-4">
+
+            <div>
+              <label class="block text-xs text-[var(--color-text-mute)] font-mono mb-1">
+                Username
+              </label>
+              <input
+                [(ngModel)]="registerForm.username"
+                name="username"
+                type="text"
+                required
+                placeholder="your_username"
+                class="w-full bg-[var(--color-surface2)] border border-[var(--color-border)]
+                       rounded-lg px-3 py-2 text-sm font-mono text-[var(--color-text)]
+                       placeholder-zinc-600 outline-none
+                       focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/20
+                       transition-all duration-200" />
+            </div>
+
+            <div>
+              <label class="block text-xs text-[var(--color-text-mute)] font-mono mb-1">
+                Email
+              </label>
+              <input
+                [(ngModel)]="registerForm.email"
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                class="w-full bg-[var(--color-surface2)] border border-[var(--color-border)]
+                       rounded-lg px-3 py-2 text-sm font-mono text-[var(--color-text)]
+                       placeholder-zinc-600 outline-none
+                       focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/20
+                       transition-all duration-200" />
+            </div>
+
+            <div>
+              <label class="block text-xs text-[var(--color-text-mute)] font-mono mb-1">
+                Password <span class="text-zinc-600">(min. 6 chars)</span>
+              </label>
+              <input
+                [(ngModel)]="registerForm.password"
+                name="password"
+                type="password"
+                required
+                minlength="6"
+                placeholder="••••••••"
+                class="w-full bg-[var(--color-surface2)] border border-[var(--color-border)]
+                      rounded-lg px-3 py-2 text-sm font-mono text-[var(--color-text)]
+                      placeholder-zinc-600 outline-none
+                      focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/20
+                      transition-all duration-200" />
+            </div>
+
+            @if (error()) {
+              <p class="text-xs text-red-400 font-mono bg-red-500/10 border border-red-500/20
+                         rounded-lg px-3 py-2">
+                ⚠ {{ error() }}
+              </p>
+            }
+
+            <button
+              type="submit"
+              [disabled]="loading()"
+              class="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400
+                     text-black font-mono font-bold text-sm
+                     transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (loading()) {
+                <span class="inline-flex items-center gap-2">
+                  <span class="w-3 h-3 border-2 border-black/30 border-t-black
+                               rounded-full animate-spin"></span>
+                  Creating account…
+                </span>
+              } @else {
+                Create Account →
+              }
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-xs text-zinc-700 font-mono mt-4">
+      Language: MiniScript 1.0 · Stack-based VM
+    </p>
+  </div>
+</div>
