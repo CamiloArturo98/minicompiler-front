@@ -114,3 +114,40 @@ html, body {
 .cm-activeLine       { background: rgba(245, 158, 11, 0.04) !important; }
 .cm-cursor           { border-left-color: var(--color-amber) !important; border-left-width: 2px !important; }
 .cm-selectionBackground { background: rgba(245, 158, 11, 0.15) !important; }
+
+/* ── Route loader ─────────────────────────────────────────────────────────── */
+
+.route-loader-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: 2px;
+  background: rgba(245, 158, 11, 0.15);
+  overflow: hidden;
+}
+
+.route-loader-bar {
+  height: 100%;
+  background: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+  border-radius: 0 2px 2px 0;
+  animation: loader-progress 0.6s ease-out forwards;
+}
+
+.route-loader-bar.complete {
+  animation: loader-complete 0.3s ease-out forwards;
+}
+
+@keyframes loader-progress {
+  0%   { width: 0%;   opacity: 1; }
+  60%  { width: 75%;  opacity: 1; }
+  100% { width: 88%;  opacity: 1; }
+}
+
+@keyframes loader-complete {
+  0%   { width: 88%; opacity: 1; }
+  80%  { width: 100%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}

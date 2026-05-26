@@ -1,1 +1,8 @@
+<!-- Route loader bar -->
+@if (loading()) {
+  <div class="route-loader-wrap">
+    <div class="route-loader-bar" [class.complete]="complete()"></div>
+  </div>
+}
+
 <router-outlet />
