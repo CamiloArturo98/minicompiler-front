@@ -1,0 +1,64 @@
+<div class="flex items-center bg-[var(--color-surface)] border-b border-[var(--color-border)]
+            overflow-x-auto overflow-y-hidden min-h-[36px]">
+
+  <!-- Loading skeleton -->
+  @if (tabService.loading()) {
+    <div class="flex items-center gap-2 px-4 py-2 animate-pulse">
+      <div class="w-20 h-3 bg-zinc-800 rounded"></div>
+      <div class="w-16 h-3 bg-zinc-800 rounded"></div>
+    </div>
+  }
+
+  <!-- Tabs -->
+  @for (tab of tabService.tabs(); track tab.id) {
+    <div
+      (click)="selectTab(tab.id)"
+      class="group relative flex items-center gap-1.5 px-4 py-2
+             min-w-[100px] max-w-[180px] border-r border-[var(--color-border)]
+             cursor-pointer select-none flex-shrink-0 transition-all duration-150"
+      [class.bg-[var(--color-bg)]]="tab.id === tabService.activeId()"
+      [class.bg-[var(--color-surface2)]]="tab.id !== tabService.activeId()"
+      [class.border-t-2]="tab.id === tabService.activeId()"
+      [class.border-t-amber-500]="tab.id === tabService.activeId()">
+
+      <!-- Rename input -->
+      @if (editingId() === tab.id) {
+        <input
+          [(ngModel)]="editName"
+          (blur)="finishRename(tab.id)"
+          (keydown)="onRenameKey(tab.id, $event)"
+          class="w-full bg-transparent text-[11px] font-mono text-[var(--color-text)]
+                 outline outline-1 outline-amber-500/60 rounded px-1"
+          autofocus />
+      } @else {
+        <span
+          (dblclick)="startRename(tab.id, tab.name, $event)"
+          class="text-[11px] font-mono truncate flex-1 transition-colors"
+          [class.text-[var(--color-text)]]="tab.id === tabService.activeId()"
+          [class.text-[var(--color-text-mute)]]="tab.id !== tabService.activeId()"
+          [title]="tab.name">
+          {{ tab.name }}
+        </span>
+      }
+
+      <!-- Close button -->
+      @if (tabService.tabs().length > 1) {
+        <button
+          (click)="closeTab(tab.id, $event)"
+          class="w-4 h-4 flex items-center justify-center rounded text-[10px]
+                 text-zinc-600 opacity-0 group-hover:opacity-100
+                 hover:text-red-400 hover:bg-red-500/10 transition-all flex-shrink-0">
+          ✕
+        </button>
+      }
+    </div>
+  }
+
+  <!-- New tab -->
+  <button
+    (click)="newTab()"
+    class="flex items-center justify-center w-8 h-full px-2 text-zinc-600 text-base
+           hover:text-amber-400 hover:bg-amber-500/5 transition-colors flex-shrink-0">
+    +
+  </button>
+</div>
