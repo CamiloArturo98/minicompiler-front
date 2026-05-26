@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Tab, TabRequest } from '../models/tab.model';
 import { environment } from '../../environments/environment';
@@ -12,7 +12,6 @@ export class TabService {
   private readonly baseUrl  = `${environment.apiUrl}/api/v1/tabs`;
   private readonly ACTIVE_KEY = 'mc_active_tab';
 
-  // ── State ──────────────────────────────────────────────────────────────────
   private readonly _tabs     = signal<Tab[]>([]);
   private readonly _activeId = signal<number | null>(
     JSON.parse(localStorage.getItem(this.ACTIVE_KEY) ?? 'null')
@@ -28,7 +27,6 @@ export class TabService {
 
   private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // ── Load ───────────────────────────────────────────────────────────────────
   loadTabs(): Observable<Tab[]> {
     this._loading.set(true);
     return this.http.get<Tab[]>(this.baseUrl).pipe(
@@ -39,14 +37,14 @@ export class TabService {
         this.setActive(exists ? savedId! : (tabs[0]?.id ?? null));
         this._loading.set(false);
       }),
-      catchError(err => {
+      catchError(() => {
+        // Backend no disponible — el compilador sigue funcionando con código local
         this._loading.set(false);
-        return throwError(() => err);
+        return of([]);
       })
     );
   }
 
-  // ── CRUD ───────────────────────────────────────────────────────────────────
   createTab(name = 'untitled.ms', code = ''): Observable<Tab> {
     const position = this._tabs().length;
     const req: TabRequest = { name, code, position };
@@ -54,7 +52,8 @@ export class TabService {
       tap(tab => {
         this._tabs.update(tabs => [...tabs, tab]);
         this.setActive(tab.id);
-      })
+      }),
+      catchError(() => of(null as any))
     );
   }
 
@@ -66,11 +65,11 @@ export class TabService {
         if (this._activeId() === id) {
           this.setActive(remaining.at(-1)?.id ?? null);
         }
-      })
+      }),
+      catchError(() => of(void 0))
     );
   }
 
-  // ── Local update + debounced backend save ──────────────────────────────────
   updateCode(id: number, code: string): void {
     this._tabs.update(tabs => tabs.map(t => t.id === id ? { ...t, code } : t));
     this.debounceSave(id);
@@ -86,14 +85,15 @@ export class TabService {
     localStorage.setItem(this.ACTIVE_KEY, JSON.stringify(id));
   }
 
-  // ── Private ────────────────────────────────────────────────────────────────
   private debounceSave(id: number): void {
     if (this.saveTimer) clearTimeout(this.saveTimer);
     this.saveTimer = setTimeout(() => {
       const tab = this._tabs().find(t => t.id === id);
       if (!tab) return;
       const req: TabRequest = { name: tab.name, code: tab.code, position: tab.position };
-      this.http.put<Tab>(`${this.baseUrl}/${id}`, req).subscribe();
+      this.http.put<Tab>(`${this.baseUrl}/${id}`, req).subscribe({
+        error: () => {} // fallo silencioso si backend no disponible
+      });
     }, 1500);
   }
 }

@@ -22,8 +22,14 @@ export class CompilerPageComponent implements OnInit {
   private readonly compilerService = inject(CompilerService);
   readonly tabService              = inject(TabService);
 
-  // Señal computada — se actualiza automáticamente al cambiar de pestaña
-  readonly activeCode = computed(() => this.tabService.activeTab()?.code ?? '');
+  // Código local — fallback cuando el backend de pestañas no está disponible
+  private readonly localCode = signal(CODE_EXAMPLES['fibonacci'].code);
+
+  // activeCode usa el tab activo si existe, si no usa el código local
+  readonly activeCode = computed(() => {
+    const tab = this.tabService.activeTab();
+    return tab ? tab.code : this.localCode();
+  });
 
   loading      = signal(false);
   response     = signal<CompileResponse | null>(null);
@@ -48,13 +54,11 @@ export class CompilerPageComponent implements OnInit {
     this.tabService.loadTabs().subscribe({
       next: tabs => {
         if (tabs.length === 0) {
-          // Primera vez — crea una pestaña con el ejemplo de fibonacci
           this.tabService
             .createTab('main.ms', CODE_EXAMPLES['fibonacci'].code)
             .subscribe();
         }
-      },
-      error: () => {}
+      }
     });
   }
 
@@ -64,8 +68,11 @@ export class CompilerPageComponent implements OnInit {
 
   onCodeChange(code: string): void {
     const id = this.tabService.activeId();
-    if (id == null) return;
-    this.tabService.updateCode(id, code);
+    if (id != null) {
+      this.tabService.updateCode(id, code);
+    } else {
+      this.localCode.set(code); // sin pestañas — guarda localmente
+    }
     const lines = code.split('\n');
     this.cursorLine.set(lines.length);
     this.cursorCol.set(lines[lines.length - 1].length + 1);
@@ -75,8 +82,11 @@ export class CompilerPageComponent implements OnInit {
     const ex = CODE_EXAMPLES[key];
     if (!ex) return;
     const id = this.tabService.activeId();
-    if (id == null) return;
-    this.tabService.updateCode(id, ex.code);
+    if (id != null) {
+      this.tabService.updateCode(id, ex.code);
+    } else {
+      this.localCode.set(ex.code); // sin pestañas — carga localmente
+    }
     this.response.set(null);
     this.compileError.set(null);
   }
