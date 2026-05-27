@@ -1,10 +1,11 @@
 import { Component, input, output, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { EditorOptions, CODE_EXAMPLES } from '../../../models/compiler.models';
 import { AuthService } from '../../../service/auth.service';
 
 @Component({
   selector: 'app-toolbar',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './toolbar.component.html',
 })
 export class ToolbarComponent {
