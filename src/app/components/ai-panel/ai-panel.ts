@@ -30,6 +30,7 @@ type PanelTab = 'chat' | 'history';
   imports: [DatePipe],
   templateUrl: './ai-panel.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block h-full' },
 })
 export class AiPanel implements AfterViewChecked, OnInit {
 
