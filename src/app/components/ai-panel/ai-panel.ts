@@ -56,10 +56,10 @@ export class AiPanel implements AfterViewChecked, OnInit {
   private shouldScroll = false;
 
   readonly quickActions: ReadonlyArray<{ id: AiAction; icon: string; label: string }> = [
-    { id: 'EXPLAIN_ERROR', icon: '🔍', label: 'Explain error'   },
-    { id: 'SUGGEST_FIX',   icon: '🔧', label: 'Suggest fix'    },
-    { id: 'GENERATE_CODE', icon: '✨', label: 'Generate code'   },
-    { id: 'ANALYZE_CODE',  icon: '📊', label: 'Analyze code'   },
+    { id: 'EXPLAIN_ERROR', icon: '🔍', label: 'Explain error'  },
+    { id: 'SUGGEST_FIX',   icon: '🔧', label: 'Suggest fix'   },
+    { id: 'GENERATE_CODE', icon: '✨', label: 'Generate code'  },
+    { id: 'ANALYZE_CODE',  icon: '📊', label: 'Analyze code'  },
   ];
 
   ngOnInit(): void {
@@ -107,13 +107,23 @@ export class AiPanel implements AfterViewChecked, OnInit {
   }
 
   triggerAction(action: AiAction): void {
-    const err  = this.error();
-    const code = this.sourceCode();
+    const err      = this.error();
+    const res      = this.response();
+    const code     = this.sourceCode();
+    const hasRun   = err !== null || res !== null;
+    const hasError = err !== null;
 
-    if ((action === 'EXPLAIN_ERROR' || action === 'SUGGEST_FIX') && !err) {
-      this.addAssistantMessage('⚠️ Run your code first so there is an error to analyze.');
-      return;
+    if (action === 'EXPLAIN_ERROR' || action === 'SUGGEST_FIX') {
+      if (!hasRun) {
+        this.addAssistantMessage('⚠️ Run your code first so there is an error to analyze.');
+        return;
+      }
+      if (!hasError) {
+        this.addAssistantMessage('✅ Your code runs correctly and has no errors — no fix needed!');
+        return;
+      }
     }
+
     if (action === 'ANALYZE_CODE' && !code.trim()) {
       this.addAssistantMessage('⚠️ The editor is empty. Write some code first.');
       return;

@@ -73,13 +73,15 @@
       </div>
     </section>
 
-    <!-- Messages — fix: flex flex-col so empty state can use flex-1 to center properly -->
+    <!-- Messages -->
     <main #messagesContainer
           class="flex-1 overflow-y-auto px-3 py-3 space-y-3 scroll-smooth flex flex-col"
           role="log" aria-live="polite" aria-relevant="additions">
 
       @if (messages().length === 0) {
-        <div class="flex flex-col items-center justify-center flex-1 gap-3 text-center px-4">
+        <!-- m-auto in a flex-col container distributes remaining space as margin,
+             centering the element vertically without relying on h-full -->
+        <div class="m-auto flex flex-col items-center gap-3 text-center px-4">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/20
                       border border-amber-500/20 flex items-center justify-center">
             <span class="text-2xl">✨</span>
@@ -191,7 +193,7 @@
           role="list" aria-label="Conversation history">
 
       @if (historyLoading()) {
-        <div class="flex flex-col items-center justify-center flex-1 gap-2">
+        <div class="m-auto flex flex-col items-center gap-2">
           <svg class="w-5 h-5 text-amber-500 animate-spin-slow" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"
                     stroke-dasharray="60" stroke-dashoffset="20"/>
@@ -199,7 +201,7 @@
           <p class="text-[10px] text-zinc-600">Loading history...</p>
         </div>
       } @else if (historyEmpty()) {
-        <div class="flex flex-col items-center justify-center flex-1 gap-3 text-center px-4">
+        <div class="m-auto flex flex-col items-center gap-3 text-center px-4">
           <div class="w-12 h-12 rounded-2xl bg-(--color-surface2) border border-(--color-border)
                       flex items-center justify-center">
             <span class="text-2xl">🕓</span>
