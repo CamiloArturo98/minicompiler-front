@@ -80,4 +80,16 @@ export class LogsPageComponent implements OnInit {
     const firstLine = str.split('\n')[0];
     return firstLine.length > max ? firstLine.slice(0, max) + '…' : firstLine;
   }
+  decodeBase64(value: string): string {
+  try {
+    return decodeURIComponent(
+      atob(value)
+        .split('')
+        .map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+        .join(''),
+    );
+  } catch {
+    return value;
+  }
+}
 }
