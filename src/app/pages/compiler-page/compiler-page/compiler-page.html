@@ -73,7 +73,7 @@
 
     <!-- AI Panel -->
     @if (aiOpen()) {
-      <div class="w-[25%] min-w-64 max-w-xs animate-slide-in overflow-hidden">
+      <div class="w-[25%] min-w-64 max-w-xs animate-slide-in overflow-hidden h-full">
         <app-ai-panel
           [response]="response()"
           [error]="compileError()"
