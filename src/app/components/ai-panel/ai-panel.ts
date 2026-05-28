@@ -43,23 +43,23 @@ export class AiPanel implements AfterViewChecked, OnInit {
 
   private readonly aiService = inject(AiService);
 
-  readonly messages      = signal<AiMessage[]>([]);
-  readonly loading       = signal(false);
-  readonly userInput     = signal('');
-  readonly activeTab     = signal<PanelTab>('chat');
-  readonly history       = signal<AiHistoryEntry[]>([]);
+  readonly messages       = signal<AiMessage[]>([]);
+  readonly loading        = signal(false);
+  readonly userInput      = signal('');
+  readonly activeTab      = signal<PanelTab>('chat');
+  readonly history        = signal<AiHistoryEntry[]>([]);
   readonly historyLoading = signal(false);
-  readonly expandedId    = signal<number | null>(null);
+  readonly expandedId     = signal<number | null>(null);
 
   readonly historyEmpty = computed(() => this.history().length === 0);
 
   private shouldScroll = false;
 
   readonly quickActions: ReadonlyArray<{ id: AiAction; icon: string; label: string }> = [
-    { id: 'EXPLAIN_ERROR', icon: '🔍', label: 'Explicar error' },
-    { id: 'SUGGEST_FIX',   icon: '🔧', label: 'Sugerir fix'   },
-    { id: 'GENERATE_CODE', icon: '✨', label: 'Generar código' },
-    { id: 'ANALYZE_CODE',  icon: '📊', label: 'Analizar código'},
+    { id: 'EXPLAIN_ERROR', icon: '🔍', label: 'Explain error'   },
+    { id: 'SUGGEST_FIX',   icon: '🔧', label: 'Suggest fix'    },
+    { id: 'GENERATE_CODE', icon: '✨', label: 'Generate code'   },
+    { id: 'ANALYZE_CODE',  icon: '📊', label: 'Analyze code'   },
   ];
 
   ngOnInit(): void {
@@ -111,24 +111,24 @@ export class AiPanel implements AfterViewChecked, OnInit {
     const code = this.sourceCode();
 
     if ((action === 'EXPLAIN_ERROR' || action === 'SUGGEST_FIX') && !err) {
-      this.addAssistantMessage('⚠️ Primero ejecuta tu código para que haya un error que analizar.');
+      this.addAssistantMessage('⚠️ Run your code first so there is an error to analyze.');
       return;
     }
     if (action === 'ANALYZE_CODE' && !code.trim()) {
-      this.addAssistantMessage('⚠️ El editor está vacío. Escribe código primero.');
+      this.addAssistantMessage('⚠️ The editor is empty. Write some code first.');
       return;
     }
 
     const labels: Record<AiAction, string> = {
-      EXPLAIN_ERROR: 'Explica el error que obtuve',
-      SUGGEST_FIX:   'Sugiere cómo arreglar el código',
-      GENERATE_CODE: 'Genera código de ejemplo',
-      ANALYZE_CODE:  'Analiza mi código',
+      EXPLAIN_ERROR: 'Explain the error I got',
+      SUGGEST_FIX:   'Suggest how to fix the code',
+      GENERATE_CODE: 'Generate example code',
+      ANALYZE_CODE:  'Analyze my code',
     };
 
     if (action === 'GENERATE_CODE') {
-      this.addUserMessage('Genera código de ejemplo interesante para MiniScript');
-      this.callAi({ action, userPrompt: 'un algoritmo interesante que demuestre las capacidades del lenguaje' });
+      this.addUserMessage('Generate interesting example code for MiniScript');
+      this.callAi({ action, userPrompt: 'an interesting algorithm that showcases the language capabilities' });
       return;
     }
 
@@ -164,11 +164,10 @@ export class AiPanel implements AfterViewChecked, OnInit {
       next: (res) => {
         this.replaceLoadingMessage(loadingMsg, res.content, request.action);
         this.loading.set(false);
-        // Refresh history in background
         this.aiService.getHistory(50).subscribe(data => this.history.set(data));
       },
       error: () => {
-        this.replaceLoadingMessage(loadingMsg, '❌ Error al conectar con la IA.', request.action);
+        this.replaceLoadingMessage(loadingMsg, '❌ Failed to connect to AI.', request.action);
         this.loading.set(false);
       },
     });
@@ -205,10 +204,10 @@ export class AiPanel implements AfterViewChecked, OnInit {
 
   getActionLabel(action: AiAction): string {
     const labels: Record<AiAction, string> = {
-      EXPLAIN_ERROR: 'Explicar error',
-      SUGGEST_FIX:   'Sugerir fix',
-      GENERATE_CODE: 'Generar código',
-      ANALYZE_CODE:  'Analizar',
+      EXPLAIN_ERROR: 'Explain error',
+      SUGGEST_FIX:   'Suggest fix',
+      GENERATE_CODE: 'Generate code',
+      ANALYZE_CODE:  'Analyze',
     };
     return labels[action] ?? action;
   }

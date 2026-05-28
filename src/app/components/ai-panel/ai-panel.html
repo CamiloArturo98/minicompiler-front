@@ -1,5 +1,5 @@
 <section class="flex flex-col h-full bg-[#0e0e10] border-l border-(--color-border)"
-         aria-label="Panel de asistente AI">
+         aria-label="AI assistant panel">
 
   <!-- Header -->
   <header class="flex items-center justify-between px-4 py-3
@@ -20,7 +20,7 @@
     </div>
 
     <button type="button" (click)="close.emit()"
-            aria-label="Cerrar panel"
+            aria-label="Close panel"
             class="text-zinc-600 hover:text-zinc-400 transition-colors p-1">
       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M18 6L6 18M6 6l12 12"/>
@@ -29,7 +29,7 @@
   </header>
 
   <!-- Tab switcher -->
-  <nav class="flex border-b border-(--color-border) shrink-0" aria-label="Pestañas del panel AI">
+  <nav class="flex border-b border-(--color-border) shrink-0" aria-label="AI panel tabs">
     <button type="button"
             (click)="setTab('chat')"
             [class]="activeTab() === 'chat'
@@ -46,7 +46,7 @@
               : 'flex-1 py-2 text-[10px] text-zinc-500 hover:text-zinc-300 border-b-2 border-transparent transition-all'"
             [attr.aria-selected]="activeTab() === 'history'"
             role="tab">
-      🕓 Historial
+      🕓 History
     </button>
   </nav>
 
@@ -55,8 +55,8 @@
 
     <!-- Quick Actions -->
     <section class="px-3 py-2 border-b border-(--color-border) shrink-0"
-             aria-label="Acciones rápidas">
-      <h3 class="text-[9px] text-zinc-600 uppercase tracking-widest mb-2">Acciones rápidas</h3>
+             aria-label="Quick actions">
+      <h3 class="text-[9px] text-zinc-600 uppercase tracking-widest mb-2">Quick actions</h3>
       <div class="grid grid-cols-2 gap-1.5">
         @for (action of quickActions; track action.id) {
           <button type="button"
@@ -73,26 +73,26 @@
       </div>
     </section>
 
-    <!-- Messages -->
+    <!-- Messages — fix: flex flex-col so empty state can use flex-1 to center properly -->
     <main #messagesContainer
-          class="flex-1 overflow-y-auto px-3 py-3 space-y-3 scroll-smooth"
+          class="flex-1 overflow-y-auto px-3 py-3 space-y-3 scroll-smooth flex flex-col"
           role="log" aria-live="polite" aria-relevant="additions">
 
       @if (messages().length === 0) {
-        <div class="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
+        <div class="flex flex-col items-center justify-center flex-1 gap-3 text-center px-4">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/20
                       border border-amber-500/20 flex items-center justify-center">
             <span class="text-2xl">✨</span>
           </div>
           <p class="text-[11px] text-zinc-500 leading-relaxed">
-            Tu asistente de IA está listo.<br>
-            Usa las acciones rápidas o escribe una pregunta.
+            Your AI assistant is ready.<br>
+            Use the quick actions or type a question.
           </p>
         </div>
       }
 
       @for (msg of messages(); track $index) {
-        <article class="animate-fade-up" aria-label="Mensaje">
+        <article class="animate-fade-up" aria-label="Message">
           @if (msg.role === 'user') {
             <div class="flex justify-end">
               <div class="max-w-[85%] px-3 py-2 rounded-2xl rounded-tr-sm
@@ -108,7 +108,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 @if (msg.loading) {
-                  <div class="py-2 text-[10px] text-zinc-500" role="status">Analizando...</div>
+                  <div class="py-2 text-[10px] text-zinc-500" role="status">Analyzing...</div>
                 } @else {
                   <div class="text-[11px] text-zinc-300 leading-relaxed prose-custom"
                        [innerHTML]="renderMarkdown(msg.content)">
@@ -128,13 +128,13 @@
     <!-- Input -->
     <footer class="px-3 py-3 border-t border-(--color-border) shrink-0">
       <div class="flex gap-2 items-end">
-        <label class="sr-only" for="ai-input">Mensaje</label>
+        <label class="sr-only" for="ai-input">Message</label>
         <textarea id="ai-input"
                   [value]="userInput()"
                   (input)="userInput.set(($any($event.target)).value ?? '')"
                   (keydown.enter)="onEnter($any($event))"
                   [disabled]="loading()"
-                  placeholder="Pregunta algo sobre tu código..."
+                  placeholder="Ask something about your code..."
                   rows="1"
                   class="w-full bg-(--color-surface2) border border-(--color-border)
                          rounded-xl px-3 py-2.5 text-[11px] text-zinc-300 font-mono
@@ -146,7 +146,7 @@
         <button type="button"
                 (click)="sendMessage()"
                 [disabled]="!userInput().trim() || loading()"
-                aria-label="Enviar mensaje"
+                aria-label="Send message"
                 class="w-9 h-9 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95
                        flex items-center justify-center transition-all duration-200
                        disabled:opacity-40 disabled:cursor-not-allowed shrink-0 shadow-lg">
@@ -162,7 +162,7 @@
         </button>
       </div>
       <p class="text-[9px] text-zinc-700 mt-1.5 text-center">
-        Enter para enviar · Shift+Enter para nueva línea
+        Enter to send · Shift+Enter for new line
       </p>
     </footer>
   }
@@ -170,43 +170,43 @@
   <!-- ── HISTORY TAB ── -->
   @if (activeTab() === 'history') {
 
-    <!-- History header toolbar -->
+    <!-- History toolbar -->
     <div class="flex items-center justify-between px-3 py-2 border-b border-(--color-border) shrink-0">
       <span class="text-[9px] text-zinc-600 uppercase tracking-widest">
-        {{ history().length }} conversaciones guardadas
+        {{ history().length }} saved conversations
       </span>
       @if (!historyEmpty()) {
         <button type="button"
                 (click)="clearHistory()"
-                aria-label="Borrar historial completo"
+                aria-label="Clear all history"
                 class="text-[9px] text-zinc-600 hover:text-red-400 transition-colors px-2 py-1
                        rounded border border-transparent hover:border-red-500/30">
-          Limpiar todo
+          Clear all
         </button>
       }
     </div>
 
     <!-- History list -->
-    <main class="flex-1 overflow-y-auto px-3 py-3 space-y-2 scroll-smooth"
-          role="list" aria-label="Historial de conversaciones">
+    <main class="flex-1 overflow-y-auto px-3 py-3 space-y-2 scroll-smooth flex flex-col"
+          role="list" aria-label="Conversation history">
 
       @if (historyLoading()) {
-        <div class="flex flex-col items-center justify-center h-full gap-2">
+        <div class="flex flex-col items-center justify-center flex-1 gap-2">
           <svg class="w-5 h-5 text-amber-500 animate-spin-slow" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"
                     stroke-dasharray="60" stroke-dashoffset="20"/>
           </svg>
-          <p class="text-[10px] text-zinc-600">Cargando historial...</p>
+          <p class="text-[10px] text-zinc-600">Loading history...</p>
         </div>
       } @else if (historyEmpty()) {
-        <div class="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
+        <div class="flex flex-col items-center justify-center flex-1 gap-3 text-center px-4">
           <div class="w-12 h-12 rounded-2xl bg-(--color-surface2) border border-(--color-border)
                       flex items-center justify-center">
             <span class="text-2xl">🕓</span>
           </div>
           <p class="text-[11px] text-zinc-500 leading-relaxed">
-            Aún no hay conversaciones.<br>
-            Usa el chat y se guardarán aquí.
+            No conversations yet.<br>
+            Use the chat and they will appear here.
           </p>
         </div>
       } @else {
@@ -216,7 +216,7 @@
                           overflow-hidden animate-fade-up transition-all duration-200
                           hover:border-amber-500/30">
 
-            <!-- Entry header (always visible) -->
+            <!-- Entry header -->
             <button type="button"
                     (click)="toggleExpand(entry.id)"
                     [attr.aria-expanded]="expandedId() === entry.id"
@@ -235,12 +235,11 @@
               </div>
 
               <div class="flex items-center gap-1 shrink-0">
-                <!-- Delete button -->
                 <span role="button"
                       (click)="deleteHistoryItem(entry.id, $any($event))"
                       (keydown.enter)="deleteHistoryItem(entry.id, $any($event))"
                       tabindex="0"
-                      aria-label="Eliminar esta conversación"
+                      aria-label="Delete this conversation"
                       class="p-1 text-zinc-700 hover:text-red-400 transition-colors rounded">
                   <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none"
                        stroke="currentColor" stroke-width="2">
@@ -248,7 +247,6 @@
                   </svg>
                 </span>
 
-                <!-- Expand chevron -->
                 <svg class="w-3 h-3 text-zinc-600 transition-transform duration-200"
                      [style.transform]="expandedId() === entry.id ? 'rotate(180deg)' : 'rotate(0deg)'"
                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -261,7 +259,6 @@
             @if (expandedId() === entry.id) {
               <div class="border-t border-(--color-border) px-3 py-2.5 space-y-3 animate-fade-up">
 
-                <!-- User message -->
                 <div class="flex justify-end">
                   <div class="max-w-[90%] px-3 py-2 rounded-2xl rounded-tr-sm
                               bg-amber-500/10 border border-amber-500/20
@@ -270,7 +267,6 @@
                   </div>
                 </div>
 
-                <!-- AI response -->
                 <div class="flex gap-2">
                   <div class="w-4 h-4 rounded bg-gradient-to-br from-amber-400 to-orange-500
                               flex items-center justify-center shrink-0 mt-0.5">
@@ -294,7 +290,7 @@
               class="w-full py-2 rounded-xl border border-(--color-border) text-[10px]
                      text-zinc-500 hover:text-amber-400 hover:border-amber-500/30
                      hover:bg-amber-500/5 transition-all duration-200">
-        ↻ Actualizar historial
+        ↻ Refresh history
       </button>
     </footer>
   }
