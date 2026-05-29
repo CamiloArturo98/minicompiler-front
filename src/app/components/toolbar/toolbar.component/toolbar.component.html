@@ -29,17 +29,30 @@
     }
   </div>
 
-  <!-- Right: Options + Run + User -->
+  <!-- Right: Logs + Guide + Toggles + Run + User -->
   <div class="flex items-center gap-4 animate-fade-up delay-200">
+
     <!-- Logs link -->
     <a routerLink="/logs"
-      class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono
-          text-[var(--color-text-mute)] border border-[var(--color-border)] rounded
-          hover:border-[var(--color-amber)] hover:text-[var(--color-amber)]
-          transition-all duration-200 tracking-wide"
-      aria-label="View compilation logs">
-        📋 Logs
+       class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono
+              text-[var(--color-text-mute)] border border-[var(--color-border)] rounded
+              hover:border-[var(--color-amber)] hover:text-[var(--color-amber)]
+              transition-all duration-200 tracking-wide"
+       aria-label="View compilation logs">
+      📋 Logs
     </a>
+
+    <!-- Tutorial / Syntax guide -->
+    <button type="button"
+            (click)="openTutorial.emit()"
+            class="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono
+                   text-[var(--color-text-mute)] border border-[var(--color-border)] rounded
+                   hover:border-[var(--color-amber)] hover:text-[var(--color-amber)]
+                   transition-all duration-200 tracking-wide"
+            aria-label="Open language guide">
+      📖 Guide
+    </button>
+
     <!-- Toggles -->
     <div class="flex items-center gap-3">
       @for (opt of optionList; track opt.key) {
@@ -88,7 +101,7 @@
       }
     </button>
 
-    <!-- Usuario + Logout -->
+    <!-- User + Logout -->
     <div class="flex items-center gap-2 pl-3 border-l border-[var(--color-border)]">
       <span class="text-[11px] font-mono text-zinc-500">
         {{ auth.currentUser()?.username }}

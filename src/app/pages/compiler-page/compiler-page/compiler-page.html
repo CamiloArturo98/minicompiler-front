@@ -1,12 +1,13 @@
 <div class="flex flex-col h-screen overflow-hidden bg-[var(--color-bg)]">
 
-  <!-- Toolbar — sin cambios -->
+  <!-- Toolbar -->
   <app-toolbar
     [options]="options()"
     [loading]="loading()"
     (run)="onRun()"
     (loadExample)="onLoadExample($event)"
-    (toggleOption)="onToggle($event)">
+    (toggleOption)="onToggle($event)"
+    (openTutorial)="tutorialOpen.set(true)">
     <button
       (click)="aiOpen.set(!aiOpen())"
       class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[11px] font-mono
@@ -28,7 +29,6 @@
     <div class="flex flex-col border-r border-[var(--color-border)] transition-all duration-300"
          [style.width]="aiOpen() ? '40%' : editorWidth + '%'">
 
-      <!-- ✦ Tab bar — nuevo -->
       <app-tab-bar />
 
       <!-- File meta -->
@@ -73,7 +73,7 @@
 
     <!-- AI Panel -->
     @if (aiOpen()) {
-      <div class="w-[25%] min-w-64 max-w-xs animate-slide-in overflow-hidden h-full">
+      <div class="w-[25%] min-w-64 max-w-xs animate-slide-in overflow-hidden">
         <app-ai-panel
           [response]="response()"
           [error]="compileError()"
@@ -88,4 +88,10 @@
     [response]="response()"
     [cursorLine]="cursorLine()"
     [cursorCol]="cursorCol()" />
+
+  <!-- Tutorial modal -->
+  @if (tutorialOpen()) {
+    <app-tutorial-modal (close)="tutorialOpen.set(false)" />
+  }
+
 </div>

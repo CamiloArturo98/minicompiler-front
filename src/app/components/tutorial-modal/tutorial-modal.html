@@ -1,0 +1,217 @@
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-black/70 backdrop-blur-sm"
+     data-backdrop="true"
+     (click)="onBackdropClick($event)"
+     (keydown)="onKeyDown($event)"
+     tabindex="-1"
+     aria-hidden="true">
+</div>
+
+<!-- Modal -->
+<div class="relative z-10 flex flex-col w-full max-w-4xl max-h-[85vh] mx-4
+            bg-[var(--color-surface)] border border-[var(--color-border)]
+            rounded-2xl shadow-2xl overflow-hidden animate-fade-up"
+     (keydown)="onKeyDown($event)">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 py-4
+              border-b border-[var(--color-border)] bg-[var(--color-surface2)] shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-[var(--color-amber)] flex items-center justify-center glow-amber">
+        <span class="text-black font-bold text-sm">📖</span>
+      </div>
+      <div>
+        <h2 class="font-['Syne'] font-bold text-sm text-[var(--color-text)] tracking-wide">
+          MiniScript Language Guide
+        </h2>
+        <p class="text-[10px] text-[var(--color-text-mute)] tracking-widest uppercase">
+          Syntax · Examples · Reference
+        </p>
+      </div>
+    </div>
+    <button type="button"
+            (click)="close.emit()"
+            aria-label="Close tutorial"
+            class="p-2 rounded-lg text-zinc-600 hover:text-zinc-300
+                   hover:bg-zinc-800 transition-all duration-200">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <nav class="w-44 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-surface2)]
+                overflow-y-auto py-2"
+         aria-label="Tutorial sections">
+      @for (section of sections; track section.id) {
+        <button type="button"
+                (click)="setSection(section.id)"
+                [class]="activeSection() === section.id
+                  ? 'w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[11px] font-mono font-semibold text-amber-400 bg-amber-500/10 border-r-2 border-amber-500 transition-all'
+                  : 'w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[11px] font-mono text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 border-r-2 border-transparent transition-all'"
+                [attr.aria-current]="activeSection() === section.id ? 'page' : null">
+          <span aria-hidden="true">{{ section.icon }}</span>
+          <span>{{ section.title }}</span>
+        </button>
+      }
+    </nav>
+
+    <!-- Content -->
+    <main class="flex-1 overflow-y-auto px-6 py-5" aria-live="polite">
+
+      @if (activeSection() !== 'quickref') {
+
+        <div class="animate-fade-up">
+          <h3 class="text-base font-['Syne'] font-bold text-[var(--color-text)] mb-1">
+            {{ activeData().icon }} {{ activeData().title }}
+          </h3>
+          <p class="text-xs text-[var(--color-text-mute)] mb-5 leading-relaxed">
+            {{ activeData().description }}
+          </p>
+
+          <div class="space-y-5">
+            @for (ex of activeData().examples; track ex.label) {
+              <div class="rounded-xl border border-[var(--color-border)] overflow-hidden">
+                <!-- Example label -->
+                <div class="flex items-center justify-between px-4 py-2
+                            bg-[var(--color-surface2)] border-b border-[var(--color-border)]">
+                  <span class="text-[10px] font-mono text-[var(--color-text-mute)]
+                               uppercase tracking-widest">
+                    {{ ex.label }}
+                  </span>
+                  @if (ex.output) {
+                    <span class="text-[10px] font-mono text-emerald-500">
+                      → {{ ex.output }}
+                    </span>
+                  }
+                </div>
+                <!-- Code block -->
+                <pre class="px-4 py-3 text-[11px] font-mono text-[var(--color-text-dim)]
+                            bg-[var(--color-bg)] overflow-x-auto leading-relaxed">{{ ex.code }}</pre>
+              </div>
+            }
+          </div>
+        </div>
+
+      } @else {
+
+        <!-- Quick Reference cheat sheet -->
+        <div class="animate-fade-up space-y-5">
+          <h3 class="text-base font-['Syne'] font-bold text-[var(--color-text)] mb-1">
+            📋 Quick Reference
+          </h3>
+          <p class="text-xs text-[var(--color-text-mute)] mb-4">Full syntax at a glance.</p>
+
+          @for (group of [
+            {
+              title: 'Variables',
+              rows: [
+                { syntax: 'var x = value;',   desc: 'Declare a variable' },
+                { syntax: 'x = newValue;',     desc: 'Reassign a variable' },
+              ]
+            },
+            {
+              title: 'Arithmetic operators',
+              rows: [
+                { syntax: '+  -  *  /  %',  desc: 'Basic math' },
+                { syntax: '**',              desc: 'Exponentiation (power)' },
+                { syntax: '++  --',          desc: 'Increment / Decrement' },
+                { syntax: '+=  -=  *=  /=', desc: 'Compound assignment' },
+              ]
+            },
+            {
+              title: 'Comparison operators',
+              rows: [
+                { syntax: '==  !=',     desc: 'Equal / Not equal' },
+                { syntax: '<  <=',      desc: 'Less than / Less or equal' },
+                { syntax: '>  >=',      desc: 'Greater than / Greater or equal' },
+              ]
+            },
+            {
+              title: 'Logical operators',
+              rows: [
+                { syntax: 'and', desc: 'Logical AND' },
+                { syntax: 'or',  desc: 'Logical OR' },
+                { syntax: 'not', desc: 'Logical NOT' },
+              ]
+            },
+            {
+              title: 'Control flow',
+              rows: [
+                { syntax: 'if (cond) { }',           desc: 'Conditional' },
+                { syntax: 'if (cond) { } else { }',  desc: 'If / else' },
+                { syntax: 'while (cond) { }',         desc: 'While loop' },
+              ]
+            },
+            {
+              title: 'Functions',
+              rows: [
+                { syntax: 'function name(p1, p2) { }', desc: 'Declare a function' },
+                { syntax: 'return value;',               desc: 'Return a value' },
+                { syntax: 'name(arg1, arg2);',            desc: 'Call a function' },
+              ]
+            },
+            {
+              title: 'Built-ins',
+              rows: [
+                { syntax: 'print(value);', desc: 'Print to output' },
+              ]
+            },
+            {
+              title: 'Types',
+              rows: [
+                { syntax: '42  3.14',        desc: 'Integer / Float' },
+                { syntax: '"hello"',          desc: 'String (double quotes)' },
+                { syntax: 'true  false',      desc: 'Boolean' },
+              ]
+            },
+            {
+              title: 'Comments',
+              rows: [
+                { syntax: '// single line',  desc: 'Line comment' },
+              ]
+            },
+          ]; track group.title) {
+            <div class="rounded-xl border border-[var(--color-border)] overflow-hidden">
+              <div class="px-4 py-2 bg-[var(--color-surface2)] border-b border-[var(--color-border)]">
+                <span class="text-[10px] font-mono text-amber-500 uppercase tracking-widest font-semibold">
+                  {{ group.title }}
+                </span>
+              </div>
+              <table class="w-full" role="grid">
+                <tbody>
+                  @for (row of group.rows; track row.syntax) {
+                    <tr class="border-b border-[var(--color-border)] last:border-0
+                               hover:bg-[var(--color-surface2)] transition-colors">
+                      <td class="px-4 py-2 w-1/2">
+                        <code class="text-[11px] font-mono text-amber-300">{{ row.syntax }}</code>
+                      </td>
+                      <td class="px-4 py-2">
+                        <span class="text-[11px] text-[var(--color-text-mute)]">{{ row.desc }}</span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <div class="px-6 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface2)]
+              flex items-center justify-between shrink-0">
+    <p class="text-[10px] text-zinc-600 font-mono">
+      Press <kbd class="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-400">Esc</kbd>
+      to close
+    </p>
+    <p class="text-[10px] text-zinc-600 font-mono">MiniScript · Stack-based VM</p>
+  </div>
+
+</div>

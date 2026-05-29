@@ -1,20 +1,28 @@
 import { Component, HostListener, inject, signal, computed, OnInit } from '@angular/core';
-import { CompilerService }    from '../../../service/compiler.service';
-import { TabService }         from '../../../service/tab.service';
+import { CompilerService }         from '../../../service/compiler.service';
+import { TabService }              from '../../../service/tab.service';
 import { CompileResponse, CompileError, EditorOptions, CODE_EXAMPLES }
   from '../../../models/compiler.models';
-import { EditorComponentTs }    from '../../../components/editor/editor.component.ts/editor.component.ts';
-import { ToolbarComponent }     from '../../../components/toolbar/toolbar.component/toolbar.component';
-import { OutputPanelComponent } from '../../../components/output-panel/output-panel.component/output-panel.component';
-import { StatusBarComponent }   from '../../../components/status-bar/status-bar.component/status-bar.component';
-import { AiPanel }              from '../../../components/ai-panel/ai-panel';
-import { TabBarComponent }      from '../../../components/tab-bar/tab-bar';
+import { EditorComponentTs }       from '../../../components/editor/editor.component.ts/editor.component.ts';
+import { ToolbarComponent }        from '../../../components/toolbar/toolbar.component/toolbar.component';
+import { OutputPanelComponent }    from '../../../components/output-panel/output-panel.component/output-panel.component';
+import { StatusBarComponent }      from '../../../components/status-bar/status-bar.component/status-bar.component';
+import { AiPanel }                 from '../../../components/ai-panel/ai-panel';
+import { TabBarComponent }         from '../../../components/tab-bar/tab-bar';
+import { TutorialModalComponent }  from '../../../components/tutorial-modal/tutorial-modal';
 
 @Component({
   selector: 'app-compiler-page',
   standalone: true,
-  imports: [ToolbarComponent, EditorComponentTs, OutputPanelComponent,
-            StatusBarComponent, AiPanel, TabBarComponent],
+  imports: [
+    ToolbarComponent,
+    EditorComponentTs,
+    OutputPanelComponent,
+    StatusBarComponent,
+    AiPanel,
+    TabBarComponent,
+    TutorialModalComponent,
+  ],
   templateUrl: './compiler-page.html',
 })
 export class CompilerPageComponent implements OnInit {
@@ -22,22 +30,21 @@ export class CompilerPageComponent implements OnInit {
   private readonly compilerService = inject(CompilerService);
   readonly tabService              = inject(TabService);
 
-  // Código local — fallback cuando el backend de pestañas no está disponible
   private readonly localCode = signal(CODE_EXAMPLES['fibonacci'].code);
 
-  // activeCode usa el tab activo si existe, si no usa el código local
   readonly activeCode = computed(() => {
     const tab = this.tabService.activeTab();
     return tab ? tab.code : this.localCode();
   });
 
-  loading      = signal(false);
-  response     = signal<CompileResponse | null>(null);
-  compileError = signal<CompileError | null>(null);
-  cursorLine   = signal(1);
-  cursorCol    = signal(1);
-  aiOpen       = signal(false);
-  editorWidth  = 50;
+  loading       = signal(false);
+  response      = signal<CompileResponse | null>(null);
+  compileError  = signal<CompileError | null>(null);
+  cursorLine    = signal(1);
+  cursorCol     = signal(1);
+  aiOpen        = signal(false);
+  tutorialOpen  = signal(false);
+  editorWidth   = 50;
 
   options = signal<EditorOptions>({
     optimize:     true,
@@ -58,7 +65,7 @@ export class CompilerPageComponent implements OnInit {
             .createTab('main.ms', CODE_EXAMPLES['fibonacci'].code)
             .subscribe();
         }
-      }
+      },
     });
   }
 
@@ -71,7 +78,7 @@ export class CompilerPageComponent implements OnInit {
     if (id != null) {
       this.tabService.updateCode(id, code);
     } else {
-      this.localCode.set(code); // sin pestañas — guarda localmente
+      this.localCode.set(code);
     }
     const lines = code.split('\n');
     this.cursorLine.set(lines.length);
@@ -85,7 +92,7 @@ export class CompilerPageComponent implements OnInit {
     if (id != null) {
       this.tabService.updateCode(id, ex.code);
     } else {
-      this.localCode.set(ex.code); // sin pestañas — carga localmente
+      this.localCode.set(ex.code);
     }
     this.response.set(null);
     this.compileError.set(null);

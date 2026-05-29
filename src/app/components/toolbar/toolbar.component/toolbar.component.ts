@@ -16,6 +16,7 @@ export class ToolbarComponent {
   run          = output<void>();
   loadExample  = output<string>();
   toggleOption = output<keyof EditorOptions>();
+  readonly openTutorial  = output<void>();
 
   readonly examples    = CODE_EXAMPLES;
   readonly exampleKeys = Object.keys(CODE_EXAMPLES);
